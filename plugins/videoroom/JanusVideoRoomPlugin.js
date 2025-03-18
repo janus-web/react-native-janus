@@ -391,7 +391,16 @@ export default class JanusVideoRoomPlugin extends JanusPlugin {
     try {
       console.log("joined to room.");
 
-      this.pc.addStream(stream);
+      //this.pc.addStream(stream);
+
+      if (stream && stream.getTracks) {
+        console.log("Using addTrack instead of addStream");
+        stream.getTracks().forEach(track => {
+          this.pc.addTrack(track, stream);
+        });
+      } else {
+        console.error("Invalid stream provided");
+      }
 
       let offer = await this.pc.createOffer({
         offerToReceiveAudio: false,
