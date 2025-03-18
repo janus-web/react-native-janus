@@ -104,11 +104,30 @@ class JanusPlugin {
             }
         };
 
-        this.pc.onaddstream = (event) => {
-            if (event && event.stream) {
-                if (this.onStreamListener && typeof this.onStreamListener === 'function') {
-                    this.onStreamListener(event.stream);
-                }
+        // this.pc.onaddstream = (event) => {
+        //     if (event && event.stream) {
+        //         if (this.onStreamListener && typeof this.onStreamListener === 'function') {
+        //             this.onStreamListener(event.stream);
+        //         }
+        //     }
+        // };
+
+        this.pc.ontrack = (event) => {
+            // Handle cases where event.streams might be empty
+            let stream;
+            if (event.streams && event.streams.length > 0) {
+                stream = event.streams[0];
+            } else {
+                // Create a new stream if one doesn't exist in the event
+                stream = new MediaStream();
+                stream.addTrack(event.track);
+            }
+            
+            console.log(`[JanusPlugin] Stream has ${stream.getTracks().length} tracks`);
+            
+            if (this.onStreamListener && typeof this.onStreamListener === 'function') {
+                console.log("[JanusPlugin] Calling onStreamListener with stream");
+                this.onStreamListener(stream);
             }
         };
 
